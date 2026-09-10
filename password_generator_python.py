@@ -1,3 +1,4 @@
+import random
 def main():
     pw_len = input("please enter the password length: ")
     password = []
@@ -18,5 +19,9 @@ def chargen(x):
     vals = [num, upper, lower, spec_char]
     char = vals[x][random.randint(0, len(vals[x])-1)]
     return(char)
+
+
+
+
 
 main()
