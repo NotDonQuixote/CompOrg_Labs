@@ -1,4 +1,35 @@
 import random
+import tkinter
+
+button_color = "#8300c9"
+background_color = "#130019"
+WIN_W, WIN_H = 800, 550
+
+'''class window(tkinter.Tk):
+    def __init__(self, master):
+        super().__init__(
+            master, width=WIN_W, height=WIN_H,
+            bg=background_color
+        )
+
+    def make_button(self, text, command, x, y):
+        button = tkinter.Button(
+            self, text=text, command=command,
+            bg=button_color, fg="white",
+            font=("Times new Roman", 16),
+            relief="raised", bd=0
+        )
+        button.place(x=x, y=y)
+'''
+root = tkinter.Tk()
+root.title("Password Generator")
+root.minsize(400, 400)
+root.geometry("300x300+50+50")
+
+tkinter.Label(root, text="enter password length").pack()
+tkinter.Label(root, text="IM GONNA CUM").pack()
+tkinter.Button(anchor="center",text="Button test")
+
 def main():
     pw_len = input("please enter the password length: ")
     password = []
@@ -20,8 +51,7 @@ def chargen(x):
     char = vals[x][random.randint(0, len(vals[x])-1)]
     return(char)
 
+#main()
+root.mainloop()
 
 
-
-
-main()
