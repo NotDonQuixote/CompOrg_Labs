@@ -27,7 +27,7 @@ root.minsize(400, 400)
 root.geometry("300x300+50+50")
 
 tkinter.Label(root, text="enter password length").pack()
-tkinter.Label(root, text="IM GONNA CUM").pack()
+tkinter.Label(root, text="Test text").pack()
 tkinter.Button(anchor="center",text="Button test")
 
 def main():
