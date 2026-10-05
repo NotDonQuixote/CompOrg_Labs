@@ -2,16 +2,26 @@ import random
 import tkinter
 
 def pwgenpt1(include_entry):
-    if include_entry.get() != "":
+    #print("test")
+    #print(include_entry.get())
+    pw_len = slidervalue.get()
+    entryspot = 0
+    if include_entry.get() == "":
             pw_len = slidervalue.get()
-            entryspot = 0
-            entry = include_entry.get().length
-            
-    password = []
+    else:
+        #print(include_entry.get())
+        entryspot = random.randint(0, (pw_len - len(include_entry.get())))
+        #print("entry stpot: ", entryspot)
+    
+    print("entry stpot: ", entryspot)
+    password = [''] * int(pw_len)
+    password[entryspot] = include_entry.get()
     password_string = ""
     for i in range(0, int(pw_len)):
+        if (password[i] != ''): #ignores user entry
+             continue
         chartype = random.randint(0, 3)
-        password.append(chargen(chartype))
+        password[i] = chargen(chartype)
     for char in password:
         print(char, end='')
     password_string = password_string.join([str(char) for char in password])
