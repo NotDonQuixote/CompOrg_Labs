@@ -16,6 +16,7 @@ def pwgenpt1(include_entry):
     print("entry stpot: ", entryspot)
     password = [''] * int(pw_len)
     password[entryspot] = include_entry.get()
+    global password_string
     password_string = ""
     for i in range(0, int(pw_len)):
         if (password[i] != ''): #ignores user entry
@@ -30,6 +31,8 @@ def pwgenpt1(include_entry):
                                     font=("Times new Roman", 14), bg="white", fg=button_color)
     password_label.pack(padx=20, pady=20)
 
+
+
 def chargen(x):
     num = [0,1,2,3,4,5,6,7,8,9,0]
     upper = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
@@ -39,6 +42,15 @@ def chargen(x):
     vals = [num, upper, lower, spec_char]
     char = vals[x][random.randint(0, len(vals[x])-1)]
     return(char)
+
+
+
+def copy_to_clipboard(text): #will reuse for later functinos so dont make the variable password_string
+    root.clipboard_clear()
+    root.clipboard_append(text)
+    root.update()
+
+
 
 button_color = "#8300c9"
 background_color = "#130019"
@@ -68,6 +80,9 @@ slider.pack(ipadx=60, ipady=20)
 button = tkinter.Button(root, text="Generate me a password!", 
                         background=second_color, font=("Times new Roman", 14), command=lambda: pwgenpt1(include_entry))
 button.pack(padx=10, pady=10)
+copy_button = tkinter.Button(root, text="Copy to clipboard",
+                            background=bluegreen, font=("Times new Roman", 12), command=lambda: copy_to_clipboard(password_string))
+copy_button.pack(padx=10, pady=10)
 quit_button = tkinter.Button(root, text= "Quit",
                               background=blue, font=("Times new Roman", 12), command=root.destroy)
 
