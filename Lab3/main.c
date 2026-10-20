@@ -20,12 +20,12 @@ void postorder(struct node *root)
     if (root != NULL) {
         postorder(root->left);  //recursively go left
         postorder(root->right); //recursively go right
-        if (root->type == VAR)
-            printf("%c ", root->data + 'a');
-        else if (root->type == CONST)
-            printf("%d ", root->data);
+        if (root->type == VAR)  //variable
+            printf("%c", root->data + 'a'); 
+        else if (root->type == CONST) //prints value
+            printf("%d", root->data);
         else
-            printf("%s ", optable[root->data].symbol);
+            printf("%s", optable[root->data].symbol);
     }
 }
 

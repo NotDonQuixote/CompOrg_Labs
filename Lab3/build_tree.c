@@ -41,7 +41,7 @@ struct node *build_tree(char exprin[]) {
     char expr[MAXEXPRLENGTH+2];
     int var;
         
-    expr[0] = '(';
+    expr[0] = '(';  //parenthesis check
     for (i = 0; i<strlen(exprin); i++)
         expr[i+1] = exprin[i];
     expr[i+1] = ')';
@@ -92,7 +92,7 @@ struct node *build_tree(char exprin[]) {
                 return(NULL);
             }
         } else {  // operator
-            switch(expr[i]) {
+            switch(expr[i]) { //map char to operator
                 case('-'):
                    if ((i==0) || (!isalpha(expr[i-1]) && !isdigit(expr[i-1])))
                        op = UMINUS;
