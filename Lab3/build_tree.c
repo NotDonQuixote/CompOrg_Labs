@@ -13,6 +13,8 @@ struct node *newNode(enum nodetype type, unsigned int data) {
     return(p);
 };
 
+//flow: 1. check for parenthesis, 2. check for variable, 3. check for number, 4. check for operator, 5. build tree
+
 struct operator optable[NUMOPTYPES] = {
     {UNARYOP, 7, RL, "-",""},
     {BINARYOP, 5, LR, "+", "add"},
@@ -57,7 +59,7 @@ struct node *build_tree(char exprin[]) {
                 opstack.ops[opstack.top] = LPAREN;
                 opstack.top++;
             } else {
-                printf("Error: too many operators\n");
+                printf("Error: too many operators\n");  //self explanatory
                 return(NULL);
             }
         } else if (isalpha(expr[i])) {
@@ -123,6 +125,9 @@ struct node *build_tree(char exprin[]) {
                    }
                 case(')'):
                    op = RPAREN; break;
+
+                case(' '):
+                     i++; continue;  //skip whitespace
                 default:
                    printf("Error: invalid character in expression: %c\n",
                          expr[i]);
