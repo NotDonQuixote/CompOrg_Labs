@@ -10,39 +10,33 @@ orange = "#ff7f00"
 pink = "#ff00ff"
 
 def pwgenpt1(include_entry):
-    #print("test")
-    #print(include_entry.get())
     pw_len = slidervalue.get()
     entryspot = 0
-    if include_entry.get() == "":
+    if include_entry.get() == "": #check for user entry, if none is found, just generate a password of the length specified by the slider
             pw_len = slidervalue.get()
-    else:
-        #print(include_entry.get())
-        entryspot = random.randint(0, (pw_len - len(include_entry.get())))
-        #print("entry stpot: ", entryspot)
+    else: #select a random spot in the password to place the user entry
+        entryspot = random.randint(0, (pw_len - len(include_entry.get()))) 
     
-    #print("entry stpot: ", entryspot)
     password = [''] * int(pw_len)
     password[entryspot] = include_entry.get()
     global password_string
     password_string = ""
-    for i in range(0, int(pw_len)):
+    for i in range(0, int(pw_len)): #for loop that generates the password character by chatacter
         if (password[i] != ''): #ignores user entry
              continue
         chartype = random.randint(0, 3)
         password[i] = chargen(chartype)
-    password_string = password_string.join([str(char) for char in password])
+    password_string = password_string.join([str(char) for char in password]) 
     password_label.config(text=f"Generated password: {password_string}")
-    #print(f"\nGenerated password: {password_string}")
 
-def chargen(x):
+def chargen(x): #picks random characters then fills the password
     num = [0,1,2,3,4,5,6,7,8,9,0]
     upper = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
     lower = ['q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m']
     spec_char = ['!','@','#','$','%','^','&','*','(',')','<','>','_','+','-','=']
     
     vals = [num, upper, lower, spec_char]
-    char = vals[x][random.randint(0, len(vals[x])-1)]
+    char = vals[x][random.randint(0, len(vals[x])-1)] #the actual moment where it picks a character 
     return(char)
 
 def copy_to_clipboard(text): #will reuse for later functinos so dont make the variable password_string
@@ -72,6 +66,9 @@ button.pack(padx=10, pady=10)
 copy_button = tkinter.Button(root, text="Copy to clipboard",
                             background=bluegreen, font=("Times new Roman", 12), command=lambda: copy_to_clipboard(password_string))
 copy_button.pack(padx=10, pady=10)
+password_book = tkinter.Button(root, text="Password Book",
+                            background=orange, font=("Times new Roman", 12), command=lambda: copy_to_clipboard(password_string))
+password_book.pack(padx=10, pady=10)
 quit_button = tkinter.Button(root, text= "Quit",
                               background=blue, font=("Times new Roman", 12), command=root.destroy)
 
