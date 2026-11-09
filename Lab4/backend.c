@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "build_tree.h"
+#include "backend.h"
 
 int regtable[NUMREG];  // reg[i] contains current number of uses of register i
 int vartable[NUMVAR];  // var[i] contains register to which var is assigned
@@ -115,7 +115,7 @@ struct node *generate_code(struct node *root)
                 root->data = destreg;
             }   
         } else if (root->type == UNARYOP) {
-            if (root->data == UMINUS) {
+            if (root->data == UMINUS || root->data == NOT) {
                 if (left->type == REG) {
                     if (reuse_reg(left->data)) {
                         destreg = left->data;
@@ -127,7 +127,10 @@ struct node *generate_code(struct node *root)
                         }
                         release_reg(left->data);
                     }
-                    sprintf(instr, "sub  x%d, x0, x%d", destreg, left->data);
+                    if (root->data == UMINUS)
+                        sprintf(instr, "sub  x%d, x0, x%d", destreg, left->data);
+                    else
+                        sprintf(instr, "xori x%d, x%d, -1", destreg, left->data);
                     printf("%s\n", instr);
                     free(left);
                     root->type = REG;
