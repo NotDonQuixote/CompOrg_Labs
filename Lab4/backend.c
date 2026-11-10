@@ -85,6 +85,11 @@ int power_of_two(unsigned int n)
     return log;
 }
 
+static int fits_in_12(int n)
+{
+    return (n >= -2048 && n <= 2047);
+}
+
 static int add_to_register(void) //allocate a new register
 {
     int r = assign_reg(-1);
@@ -94,7 +99,7 @@ static int add_to_register(void) //allocate a new register
     }
     return r;
 }
-
+ 
 struct node *generate_code(struct node *root)
 {
     struct node *left, *right;
