@@ -29,17 +29,6 @@ void postorder(struct node *root)
     }
 }
 
-int power_of_two(int n)
-{
-    if (n % 2 != 0)
-        return 0;
-    else if (n == 0)
-        return 1;
-    else
-        return power_of_two(n / 2);
-}
-
-
 
 int main()
 {

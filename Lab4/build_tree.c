@@ -13,8 +13,6 @@ struct node *newNode(enum nodetype type, unsigned int data) {
     return(p);
 };
 
-//flow: 1. check for parenthesis, 2. check for variable, 3. check for number, 4. check for operator, 5. build tree
-
 struct operator optable[NUMOPTYPES] = {
     {UNARYOP, 7, RL, "-",""},
     {BINARYOP, 5, LR, "+", "add"},

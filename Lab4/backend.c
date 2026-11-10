@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 #include "backend.h"
 
 int regtable[NUMREG];  // reg[i] contains current number of uses of register i
@@ -68,6 +70,29 @@ void printvartable(void)
     for (int i = 0; i < NUMVAR; i++)
       if (vartable[i] != -1)
         printf("variable: %c, register: x%d\n", 'a'+i, vartable[i]);
+}
+
+int power_of_two(unsigned int n)
+{
+    int log = 0;
+
+    if (n == 0 || (n & (n - 1)) != 0)   
+        return 0;
+    while (n > 1) {
+        n >>= 1;
+        log++;
+    }
+    return log;
+}
+
+static int add_to_register(void) //allocate a new register
+{
+    int r = assign_reg(-1);
+    if (r == -1) {
+        printf("Error: out of registers\n");
+        exit(-1);
+    }
+    return r;
 }
 
 struct node *generate_code(struct node *root)
