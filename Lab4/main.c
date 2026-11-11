@@ -4,8 +4,7 @@
 #include <ctype.h>
 #include "backend.h"
   
-void postorder(struct node *root)
-{
+void postorder(struct node *root){
     if (root != NULL) {
         postorder(root->left);  //recursively go left
         postorder(root->right); //recursively go right
@@ -19,21 +18,19 @@ void postorder(struct node *root)
 }
 
 
-int main()
-{
+int main(){
     char expr1[MAXEXPRLENGTH];
     struct node *root;
-
     while (fgets(expr1, MAXEXPRLENGTH, stdin) != NULL) {   
         expr1[strcspn(expr1, "\r\n")] = '\0'; //strip newline
         if (expr1[0] == '\0') //skip blanks
             continue;
         printf("Expression to parse: %s\n", expr1);
         init_regtable(); //initialize register table i hope this owrks
-        init_vartable(); //initialize variable table
+        init_vartable(); 
         root = build_tree(expr1);
         if (root == NULL) {
-            printf("Error in expression tree\n\n");
+            printf("Error in expression tree\n");
             continue;
         }
         printvartable();
@@ -51,6 +48,5 @@ int main()
         printregtable();
         printf("\n");
     }
-
     return 0;
 }

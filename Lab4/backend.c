@@ -100,7 +100,7 @@ static int add_to_register(void) //allocate a new register
     return r;
 }
  
-struct node *generate_code(struct node *root)
+struct node *generate_code(struct node *root) 
 {
     struct node *left, *right;
     char instr[20];
