@@ -3,17 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "backend.h"
-
-int get_str(char s[], int lim)
-{
-    int c, i;
-    
-    i = 0;
-    for (i=0; i<lim-1 && (c=getchar())!=EOF && c!='\n'; ++i)
-        s[i] = c;
-    s[i] = '\0';
-    return i;
-}
   
 void postorder(struct node *root)
 {
@@ -35,32 +24,32 @@ int main()
     char expr1[MAXEXPRLENGTH];
     struct node *root;
 
-    while (get_str(expr1, MAXEXPRLENGTH)) {   
+    while (fgets(expr1, MAXEXPRLENGTH, stdin) != NULL) {   
+        expr1[strcspn(expr1, "\r\n")] = '\0'; //strip newline
+        if (expr1[0] == '\0') //skip blanks
+            continue;
         printf("Expression to parse: %s\n", expr1);
+        init_regtable(); //initialize register table i hope this owrks
+        init_vartable(); //initialize variable table
         root = build_tree(expr1);
+        if (root == NULL) {
+            printf("Error in expression tree\n\n");
+            continue;
+        }
+        printvartable();
+        printregtable();
         printf("Postfix: ");
         postorder(root);
-        printf("\n\n");
+        printf("\n");
         
-        init_regtable(); // register table i hope works
-        init_vartable();
-
-        int assigned[NUMVAR] = {0};
-        for (int i = 0; expr1[i] != '\0'; i++) {
-            if (expr1[i] >= 'a' && expr1[i] < 'a' + NUMVAR) {
-                int var = expr1[i] - 'a';
-                if (!assigned[var]) {
-                    if (assign_reg(var) == -1) {
-                        printf("Error: out of registers\n");
-                        break;
-                    }
-                    assigned[var] = 1;
-                }
-            }
-        }
-
-        printf("Generated code:\n");
+        //printf("Generated code:\n");
         root = generate_code(root);
+        if (root->type == REG)
+            printf("root: x%d\n", root->data);
+        else
+            printf("root: %d\n", root->data);
+        printregtable();
+        printf("\n");
     }
 
     return 0;
