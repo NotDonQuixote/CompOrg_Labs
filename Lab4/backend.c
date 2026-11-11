@@ -323,75 +323,26 @@ static void gen_unary(struct node *root, struct node *left)
     }
 }
 
-
-struct node *generate_code(struct node *root) 
+struct node *generate_code(struct node *root) //split ito a bunch of helper methods because I suck at reading long blocks
 {
-    struct node *left, *right;
-    char instr[20];
-    int destreg;
+    struct node *left = NULL, *right = NULL;
 
     if (root) {
         if (root->left)
             left = generate_code(root->left);
         if (root->right)
             right = generate_code(root->right);
-        if (root->type == REG)
+        if (root->type == REG || root->type == CONST)
             return(root);
         else if (root->type == VAR) {
             root->type = REG;
             root->data = vartable[root->data];
             return(root);
-        } else if (root->type == BINARYOP) {
-            if((left->type == REG) && (right->type == REG)) {
-                if (reuse_reg(left->data) == 1) {
-                    destreg = left->data;
-                    release_reg(right->data);
-                }
-                else if (reuse_reg(right->data) == 1) {
-                    destreg = right->data;
-                    release_reg(left->data);
-                }
-                else {
-                    destreg = assign_reg(-1);
-                    if (destreg == -1) {
-                        printf("Error: out of registers\n");
-                        exit(-1); 
-                    }
-                    release_reg(left->data);
-                    release_reg(right->data);
-                }
-                sprintf(instr, "%s  x%d, x%d, x%d", optable[root->data].instr, destreg, 
-                        left->data, right->data);
-                printf("%s\n", instr);
-                free(left);
-                free(right);
-                root->type = REG;
-                root->data = destreg;
-            }   
-        } else if (root->type == UNARYOP) {
-            if (root->data == UMINUS || root->data == NOT) {
-                if (left->type == REG) {
-                    if (reuse_reg(left->data)) {
-                        destreg = left->data;
-                    } else {
-                        destreg = assign_reg(-1);
-                        if (destreg == -1) {
-                            printf("Error: out of registers\n");
-                            exit(-1);
-                        }
-                        release_reg(left->data);
-                    }
-                    if (root->data == UMINUS)
-                        sprintf(instr, "sub  x%d, x0, x%d", destreg, left->data);
-                    else
-                        sprintf(instr, "xori x%d, x%d, -1", destreg, left->data);
-                    printf("%s\n", instr);
-                    free(left);
-                    root->type = REG;
-                    root->data = destreg;
-                }
-            }
-        }
+        } else if (root->type == BINARYOP)
+            gen_binary(root, left, right);
+        else if (root->type == UNARYOP)
+            gen_unary(root, left);
     }
     return(root);
 }
+
