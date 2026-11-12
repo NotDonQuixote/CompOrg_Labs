@@ -26,13 +26,14 @@ int main(){
         if (expr1[0] == '\0') //skip blanks
             continue;
         printf("Expression to parse: %s\n", expr1);
-        init_regtable(); //initialize register table i hope this owrks
-        init_vartable(); 
+            //init regtable and vartable used to be here DONT FUCKING FORGET
         root = build_tree(expr1);
         if (root == NULL) {
             printf("Error in expression tree\n");
             continue;
         }
+        init_regtable(); //initialize register table i hope this owrks
+        init_vartable();
         printvartable();
         printregtable();
         printf("Postfix: ");
@@ -45,7 +46,7 @@ int main(){
             printf("root: x%d\n", root->data);
         else
             printf("root: %d\n", root->data);
-        printregtable();
+        //printregtable(); it was printing twice here
         printf("\n");
     }
     return 0;

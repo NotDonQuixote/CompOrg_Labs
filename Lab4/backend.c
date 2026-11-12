@@ -21,18 +21,20 @@ void init_vartable(void)
     
 int reuse_reg(int reg)
 {
+    printf("Called reuse reg on register x%d\n", reg);
+
     if (regtable[reg] == 1)
         return(1);
     if (regtable[reg] > 1)
         return(0);
     printf("Error: called reuse_reg on unused register\n");
-    return(-1);  // shouldn't happen
+    return(-1);  
 }
 
 int assign_reg(int var)
 { 
-        if ((var != -1) && (vartable[var] != -1)) {
-            regtable[vartable[var]]++; // variable is already assigned a register
+        if ((var != -1) && (vartable[var] != -1)) { //if var already has a register
+            regtable[vartable[var]]++; 
             return(vartable[var]);
         } else {
             for (int i = 5; i < NUMREG; i++)     // find unassigned register
@@ -41,7 +43,7 @@ int assign_reg(int var)
                     if (var != -1) {
                         vartable[var] = i;
                     }
-                    return(i);;
+                    return(i);
             }
             return(-1);  // out of registers
         }
@@ -56,7 +58,7 @@ int release_reg(int reg)
         return(-1);
 }    
 
-void printregtable(void)
+void printregtable(void)  //why is this calling twice when nothing uses it
 {
     printf("register table -- number of uses of each register\n");
     for (int i = 0; i < NUMREG; i++)
@@ -84,14 +86,10 @@ int power_of_two(unsigned int n)
     }
     return log;
 }
-//actual risc-v part 
 
-static int fits_in_12(int n)
-{
-    return (n >= -2048 && n <= 2047);
-}
+static int fits_in_12(int v) { return v >= -2048 && v <= 2047; }
 
-static int alloc_reg(void) //allocate a new register
+static int alloc_reg(void)
 {
     int r = assign_reg(-1);
     if (r == -1) {
@@ -101,24 +99,21 @@ static int alloc_reg(void) //allocate a new register
     return r;
 }
 
-static void make_const(struct node *root, int v)//for handling large constants
-{
-    root->type = CONST;
-    root->data = v;
-    root->left = root->right = NULL;
-}
-
-static void load_const(int reg, int v)
+static void load_const(int reg, int v) //done
 {
     if (fits_in_12(v)) {
-        printf("addi x%d, x0, %d\n", reg, v);
+        //printf("fits12 true\n");
+        printf("addi x%d, x%d, %d\n", reg, reg, v);
     } else {
         uint32_t u = (uint32_t) v;
-        uint32_t hi = ((u + 0x800u) >> 12) & 0xFFFFFu;   // +0x800 compensates for sign-extended low part
-        int32_t  lo = (int32_t) (u - (hi << 12));         // always in [-2048, 2047]
+        uint32_t hi = ((u + 0x800u) >> 12) & 0xFFFFFu;  
+        int32_t  lo = (int32_t) (u - (hi << 12));      
         printf("lui  x%d, %u\n", reg, (unsigned) hi);
         if (lo != 0)
+        {
             printf("addi x%d, x%d, %d\n", reg, reg, lo);
+            printf("line 114\n");
+        }
     }
 }
 
@@ -129,7 +124,7 @@ static void emit_r(const char *name, int rd, int rs1, int rs2)
 
 static void emit_i(const char *name, int rd, int rs1, int imm)
 {
-    if (strcmp(name, "srai") == 0)       // spacing matches the provided output2b.txt
+    if (strcmp(name, "srai") == 0) 
         printf("%s  x%d, x%d, %d\n", name, rd, rs1, imm);
     else
         printf("%s x%d, x%d, %d\n", name, rd, rs1, imm);
@@ -159,24 +154,27 @@ static int fold(int op, int a, int b, int *res)
     return 1;
 }
 
-
-
-//gets the registesr
+static void make_const(struct node *root, int v)
+{
+    root->type = CONST;
+    root->data = v;
+    root->left = root->right = NULL;
+}
 
 static const char *imm_form(int op, int imm, int *immout)
 {
     int lg;
     *immout = imm;
     switch (op) {
-        case ADD: return fits12(imm) ? "addi" : NULL;
-        case SUB: if (imm != INT32_MIN && fits12(-imm)) { *immout = -imm; return "addi"; }
+        case ADD: return fits_in_12(imm) ? "addi" : NULL;
+        case SUB: if (imm != INT32_MIN && fits_in_12(-imm)) { *immout = -imm; return "addi"; }
                   return NULL;
-        case AND: return fits12(imm) ? "andi" : NULL;
-        case OR:  return fits12(imm) ? "ori"  : NULL;
-        case XOR: return fits12(imm) ? "xori" : NULL;
+        case AND: return fits_in_12(imm) ? "andi" : NULL;
+        case OR:  return fits_in_12(imm) ? "ori"  : NULL;
+        case XOR: return fits_in_12(imm) ? "xori" : NULL;
         case SLL: return (imm >= 0 && imm < 32) ? "slli" : NULL;
         case SRL: return (imm >= 0 && imm < 32) ? "srli" : NULL;
-        case MUL: if (imm > 0 && (lg = power_of_two((unsigned) imm)) > 0) {   // strength reduction
+        case MUL: if (imm > 0 && (lg = power_of_two((unsigned) imm)) > 0) {   
                       *immout = lg; return "slli";
                   }
                   return NULL;
@@ -193,10 +191,10 @@ static void gen_reg_reg(struct node *root, struct node *left, struct node *right
     int destreg;
     char instr[20];
 
-    if (reuse_reg(left->data) == 1) {
+    if (reuse_reg(left->data) == 1) { printf("line 191 error\n");
         destreg = left->data;
         release_reg(right->data);
-    } else if (reuse_reg(right->data) == 1) {
+    } else if (reuse_reg(right->data) == 1) {  printf("line 194 error\n");
         destreg = right->data;
         release_reg(left->data);
     } else {
@@ -212,6 +210,7 @@ static void gen_reg_reg(struct node *root, struct node *left, struct node *right
     root->type = REG;
     root->data = destreg;
 }
+
 
 static void gen_reg_const(struct node *root, struct node *left, struct node *right)
 {
@@ -233,14 +232,16 @@ static void gen_reg_const(struct node *root, struct node *left, struct node *rig
         printf("Error: division by zero\n");
         exit(-1);
     }
-
-    reused = (reuse_reg(left->data) == 1);
-    rd = reused ? left->data : alloc_reg();
+    //for some reason its using register x0 
+    reused = (reuse_reg(right->data) == 1); printf("called reuse reg at 233, left register = x%d\n", left->data); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
+    printf("called reuse reg at 233, right register = x%d\n", right->data);
+    //printf("Test: right ->  dataa = %d\n", right->data); //its still using x0 
+rd = reused ? right->data : alloc_reg(); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
 
     form = imm_form(op, imm, &immv);
     if (form) {
         emit_i(form, rd, left->data, immv);
-    } else {                                             // constant needs a register
+    } else {                                           
         int tmp = alloc_reg();
         load_const(tmp, imm);
         emit_r(optable[op].instr, rd, left->data, tmp);
@@ -257,7 +258,7 @@ static void gen_const_reg(struct node *root, struct node *left, struct node *rig
 {
     int op = root->data, rd, tmp, reused;
 
-    reused = (reuse_reg(right->data) == 1);
+    reused = (reuse_reg(right->data) == 1); printf("called reuse reg at 258, register = x%d\n", right->data);
     rd = reused ? right->data : alloc_reg();
     tmp = alloc_reg();
     load_const(tmp, left->data);
@@ -270,12 +271,11 @@ static void gen_const_reg(struct node *root, struct node *left, struct node *rig
     root->data = rd;
 }
 
-
 static void gen_binary(struct node *root, struct node *left, struct node *right)
 {
     int res;
 
-    if (left->type == CONST && right->type == CONST) {   // constant folding
+    if (left->type == CONST && right->type == CONST) { 
         if (!fold(root->data, left->data, right->data, &res)) {
             printf("Error: division by zero\n");
             exit(-1);
@@ -288,25 +288,24 @@ static void gen_binary(struct node *root, struct node *left, struct node *right)
         gen_reg_const(root, left, right);
     } else if (left->type == CONST && right->type == REG) {
         if (is_commutative(root->data))
-            gen_reg_const(root, right, left);            // swap so the constant is on the right
+            gen_reg_const(root, right, left);          
         else
             gen_const_reg(root, left, right);
     }
 }
-
-
 
 static void gen_unary(struct node *root, struct node *left)
 {
     int destreg;
     char instr[20];
 
-    if (left->type == CONST) {                           // fold
+    if (left->type == CONST) {                       
         int v = left->data;
         free(left);
         make_const(root, root->data == UMINUS ? (int)(0u - (uint32_t) v) : ~v);
     } else if (left->type == REG) {
         if (reuse_reg(left->data) == 1) {
+            //printf("Line 300 error\n");
             destreg = left->data;
         } else {
             destreg = alloc_reg();
@@ -323,7 +322,7 @@ static void gen_unary(struct node *root, struct node *left)
     }
 }
 
-struct node *generate_code(struct node *root) //split ito a bunch of helper methods because I suck at reading long blocks
+struct node *generate_code(struct node *root)
 {
     struct node *left = NULL, *right = NULL;
 
@@ -345,4 +344,3 @@ struct node *generate_code(struct node *root) //split ito a bunch of helper meth
     }
     return(root);
 }
-
