@@ -21,7 +21,7 @@ void init_vartable(void)
     
 int reuse_reg(int reg)
 {
-    printf("Called reuse reg on register x%d\n", reg);
+    //printf("Called reuse reg on register x%d\n", reg);
 
     if (regtable[reg] == 1)
         return(1);
@@ -191,10 +191,10 @@ static void gen_reg_reg(struct node *root, struct node *left, struct node *right
     int destreg;
     char instr[20];
 
-    if (reuse_reg(left->data) == 1) { printf("line 191 error\n");
+    if (reuse_reg(left->data) == 1) { //printf("line 191 error\n");
         destreg = left->data;
         release_reg(right->data);
-    } else if (reuse_reg(right->data) == 1) {  printf("line 194 error\n");
+    } else if (reuse_reg(right->data) == 1) {  //printf("line 194 error\n");
         destreg = right->data;
         release_reg(left->data);
     } else {
@@ -233,10 +233,10 @@ static void gen_reg_const(struct node *root, struct node *left, struct node *rig
         exit(-1);
     }
     //for some reason its using register x0 
-    reused = (reuse_reg(right->data) == 1); printf("called reuse reg at 233, left register = x%d\n", left->data); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
-    printf("called reuse reg at 233, right register = x%d\n", right->data);
+    reused = (reuse_reg(left->data) == 1); //printf("called reuse reg at 233, left register = x%d\n", left->data); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
+    //printf("called reuse reg at 233, right register = x%d\n", right->data);
     //printf("Test: right ->  dataa = %d\n", right->data); //its still using x0 
-rd = reused ? right->data : alloc_reg(); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
+rd = reused ? left->data : alloc_reg(); //I CHANGED LEFT TO RIGHT HERE DONT FORGET
 
     form = imm_form(op, imm, &immv);
     if (form) {
@@ -258,7 +258,7 @@ static void gen_const_reg(struct node *root, struct node *left, struct node *rig
 {
     int op = root->data, rd, tmp, reused;
 
-    reused = (reuse_reg(right->data) == 1); printf("called reuse reg at 258, register = x%d\n", right->data);
+    reused = (reuse_reg(right->data) == 1); //printf("called reuse reg at 258, register = x%d\n", right->data);
     rd = reused ? right->data : alloc_reg();
     tmp = alloc_reg();
     load_const(tmp, left->data);
@@ -334,10 +334,17 @@ struct node *generate_code(struct node *root)
         if (root->type == REG || root->type == CONST)
             return(root);
         else if (root->type == VAR) {
+            int reg = assign_reg(root->data);
+            if (reg == -1) {
+                printf("Error: out of registers\n");
+                exit(-1);
+            }
             root->type = REG;
-            root->data = vartable[root->data];
-            return(root);
-        } else if (root->type == BINARYOP)
+            root ->data = reg;
+            return root;
+        } 
+
+        else if (root->type == BINARYOP)
             gen_binary(root, left, right);
         else if (root->type == UNARYOP)
             gen_unary(root, left);
