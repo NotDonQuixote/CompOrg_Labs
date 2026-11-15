@@ -76,16 +76,27 @@ void printvartable(void)
 
 int power_of_two(unsigned int n)
 {
+        printf("parsed int n = %d\n", n);
+        if (n > 0 && (n & (n - 1)) == 0) {
+            printf("%d is power of two\n", n);
+            
+        }else {
+            printf("not a power of two\n");
+            return -1; // Not a power of two
+        }
     int log = 0;
 
     if (n == 0 || (n & (n - 1)) != 0)   
         return 0;
     while (n > 1) {
         n >>= 1;
+        printf("log = %d\n", log);
         log++;
     }
     return log;
 }
+
+
 
 static int fits_in_12(int v) { return v >= -2048 && v <= 2047; }
 
@@ -211,7 +222,6 @@ static void gen_reg_reg(struct node *root, struct node *left, struct node *right
     root->data = destreg;
 }
 
-
 static void gen_reg_const(struct node *root, struct node *left, struct node *right)
 {
     int op = root->data, imm = right->data, immv, rd, reused;
@@ -331,7 +341,11 @@ struct node *generate_code(struct node *root)
             left = generate_code(root->left);
         if (root->right)
             right = generate_code(root->right);
-        if (root->type == REG || root->type == CONST)
+        if (root->type == CONST) {
+            printf("Test: power_of_two(%d) = %d\n",
+                   root->data, power_of_two((unsigned) root->data));
+            return root;
+        } else if (root->type == REG)
             return(root);
         else if (root->type == VAR) {
             int reg = assign_reg(root->data);
