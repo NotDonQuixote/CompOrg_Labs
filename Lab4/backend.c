@@ -116,6 +116,7 @@ static void load_const(int reg, int v) //done
         //printf("fits12 true\n");
         printf("addi x%d, x%d, %d\n", reg, reg, v);
     } else {
+        printf("integer is too large for immediate field\n");
         uint32_t u = (uint32_t) v;
         uint32_t hi = ((u + 0x800u) >> 12) & 0xFFFFFu;  
         int32_t  lo = (int32_t) (u - (hi << 12));      
@@ -123,7 +124,7 @@ static void load_const(int reg, int v) //done
         if (lo != 0)
         {
             printf("addi x%d, x%d, %d\n", reg, reg, lo);
-            printf("line 114\n");
+
         }
     }
 }
