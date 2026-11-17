@@ -96,8 +96,6 @@ int power_of_two(unsigned int n)
     return log;
 }
 
-
-
 static int fits_in_12(int v) { return v >= -2048 && v <= 2047; }
 
 static int alloc_reg(void)
